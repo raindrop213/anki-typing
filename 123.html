@@ -1,0 +1,172 @@
+{{VocabFurigana}}
+
+<div id="romaji"></div>
+
+<script>
+        const hiraganaToRomaji = {
+            // 基本五十音
+            'あ': 'a', 'い': 'i', 'う': 'u', 'え': 'e', 'お': 'o',
+            'か': 'ka', 'き': 'ki', 'く': 'ku', 'け': 'ke', 'こ': 'ko',
+            'が': 'ga', 'ぎ': 'gi', 'ぐ': 'gu', 'げ': 'ge', 'ご': 'go',
+            'さ': 'sa', 'し': 'shi', 'す': 'su', 'せ': 'se', 'そ': 'so',
+            'ざ': 'za', 'じ': 'ji', 'ず': 'zu', 'ぜ': 'ze', 'ぞ': 'zo',
+            'た': 'ta', 'ち': 'chi', 'つ': 'tsu', 'て': 'te', 'と': 'to',
+            'だ': 'da', 'ぢ': 'ji', 'づ': 'zu', 'で': 'de', 'ど': 'do',
+            'な': 'na', 'に': 'ni', 'ぬ': 'nu', 'ね': 'ne', 'の': 'no',
+            'は': 'ha', 'ひ': 'hi', 'ふ': 'fu', 'へ': 'he', 'ほ': 'ho',
+            'ば': 'ba', 'び': 'bi', 'ぶ': 'bu', 'べ': 'be', 'ぼ': 'bo',
+            'ぱ': 'pa', 'ぴ': 'pi', 'ぷ': 'pu', 'ぺ': 'pe', 'ぽ': 'po',
+            'ま': 'ma', 'み': 'mi', 'む': 'mu', 'め': 'me', 'も': 'mo',
+            'や': 'ya', 'ゆ': 'yu', 'よ': 'yo',
+            'ら': 'ra', 'り': 'ri', 'る': 'ru', 'れ': 're', 'ろ': 'ro',
+            'わ': 'wa', 'ゐ': 'wi', 'ゑ': 'we', 'を': 'wo', 'ん': 'n',
+            
+            // 拗音 (きゃ、しゃ等)
+            'きゃ': 'kya', 'きゅ': 'kyu', 'きょ': 'kyo',
+            'ぎゃ': 'gya', 'ぎゅ': 'gyu', 'ぎょ': 'gyo',
+            'しゃ': 'sha', 'しゅ': 'shu', 'しょ': 'sho',
+            'じゃ': 'ja', 'じゅ': 'ju', 'じょ': 'jo',
+            'ちゃ': 'cha', 'ちゅ': 'chu', 'ちょ': 'cho',
+            'ぢゃ': 'ja', 'ぢゅ': 'ju', 'ぢょ': 'jo',
+            'にゃ': 'nya', 'にゅ': 'nyu', 'にょ': 'nyo',
+            'ひゃ': 'hya', 'ひゅ': 'hyu', 'ひょ': 'hyo',
+            'びゃ': 'bya', 'びゅ': 'byu', 'びょ': 'byo',
+            'ぴゃ': 'pya', 'ぴゅ': 'pyu', 'ぴょ': 'pyo',
+            'みゃ': 'mya', 'みゅ': 'myu', 'みょ': 'myo',
+            'りゃ': 'rya', 'りゅ': 'ryu', 'りょ': 'ryo'
+        };
+
+        // 平假名转ヘボン式罗马音函数
+        function hiraganaToHepburnRomaji(hiragana) {
+            if (!hiragana || hiragana.trim() === '') return '';
+            
+            let result = '';
+            let i = 0;
+            
+            while (i < hiragana.length) {
+                let matched = false;
+                
+                // 处理促音 (っ)
+                if (hiragana[i] === 'っ' && i + 1 < hiragana.length) {
+                    const nextChar = hiragana[i + 1];
+                    // 促音后的辅音双写
+                    if (nextChar && hiraganaToRomaji[nextChar]) {
+                        const nextRomaji = hiraganaToRomaji[nextChar];
+                        const firstConsonant = nextRomaji[0];
+                        // 特殊处理：ch->tch, sh->ssh, ts->tts
+                        if (nextRomaji.startsWith('ch')) {
+                            result += 't';
+                        } else if (nextRomaji.startsWith('sh')) {
+                            result += 's';
+                        } else if (nextRomaji.startsWith('ts')) {
+                            result += 't';
+                        } else {
+                            result += firstConsonant;
+                        }
+                    }
+                    i++;
+                    continue;
+                }
+                
+                // 处理长音 (ー)
+                if (hiragana[i] === 'ー') {
+                    // 长音符延长前面的元音
+                    if (result.length > 0) {
+                        const lastChar = result[result.length - 1];
+                        if (['a', 'i', 'u', 'e', 'o'].includes(lastChar)) {
+                            result += lastChar;
+                        } else {
+                            // 如果最后不是元音，尝试添加相应的元音
+                            result += 'u'; // 默认延长音
+                        }
+                    }
+                    i++;
+                    continue;
+                }
+                
+                // 尝试匹配拗音（3字符，如きゃ）
+                if (i + 2 < hiragana.length) {
+                    const threeChar = hiragana.substring(i, i + 3);
+                    if (hiraganaToRomaji[threeChar]) {
+                        result += hiraganaToRomaji[threeChar];
+                        i += 3;
+                        matched = true;
+                    }
+                }
+                
+                // 尝试匹配拗音（2字符，如きゃ）
+                if (!matched && i + 1 < hiragana.length) {
+                    const twoChar = hiragana.substring(i, i + 2);
+                    if (hiraganaToRomaji[twoChar]) {
+                        result += hiraganaToRomaji[twoChar];
+                        i += 2;
+                        matched = true;
+                    }
+                }
+                
+                // 匹配单字符
+                if (!matched) {
+                    const oneChar = hiragana[i];
+                    if (hiraganaToRomaji[oneChar]) {
+                        result += hiraganaToRomaji[oneChar];
+                    } else {
+                        // 如果无法转换，保持原字符
+                        result += oneChar;
+                    }
+                    i++;
+                }
+            }
+            
+            // 处理词尾的ん
+            result = result.replace(/n([bmp])/g, 'm$1'); // n在b,m,p前变为m
+            
+            return result;
+        }
+
+        // 初始化函数
+        function initializeRomajiDisplay() {
+            try {
+                // 获取振假名字段值
+                const furiganaField = "{{VocabFurigana}}";
+                console.log('原始振假名字段:', furiganaField);
+                
+                // 检查字段是否为空或为模板标记
+                if (!furiganaField || furiganaField.trim() === '' || furiganaField === '{{VocabFurigana}}') {
+                    console.warn('VocabFurigana 字段为空或未找到');
+                    document.getElementById('romaji').innerHTML = '<span style="color: red;">振假名字段为空</span>';
+                    return;
+                }
+                
+                // 转换为罗马音
+                const targetRomaji = hiraganaToHepburnRomaji(furiganaField);
+                console.log('转换后的罗马音:', targetRomaji);
+                
+                // 获取目标元素并显示结果
+                const romajiElement = document.getElementById('romaji');
+                if (romajiElement) {
+                    if (targetRomaji && targetRomaji.trim() !== '') {
+                        romajiElement.innerHTML = targetRomaji;
+                    } else {
+                        romajiElement.innerHTML = '<span style="color: orange;">无法转换为罗马音</span>';
+                    }
+                } else {
+                    console.error('找不到 id="romaji" 的元素');
+                }
+                
+            } catch (error) {
+                console.error('罗马音转换出错:', error);
+                const romajiElement = document.getElementById('romaji');
+                if (romajiElement) {
+                    romajiElement.innerHTML = '<span style="color: red;">转换出错: ' + error.message + '</span>';
+                }
+            }
+        }
+
+        // 确保DOM加载完成后再执行
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeRomajiDisplay);
+        } else {
+            // 如果DOM已经加载完成，延迟一下再执行，确保Anki字段已经渲染
+            setTimeout(initializeRomajiDisplay, 50);
+        }
+</script>

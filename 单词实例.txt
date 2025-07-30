@@ -1,0 +1,14 @@
+NoteID:0cfa6650-2ed7-11ef-a183-99ad05e145f0
+VocabKanji:無難
+VocabPitch:⓪
+VocabPoS:ナ形・名
+VocabFurigana:ぶなん
+VocabDefCN:没有缺点，无可非议，说得过去
+VocabPlus:
+VocabAudio:[sound:無難_ブナン━_0_NHK-2016-local.mp3]
+SentType1:
+SentKanji1:この服ならまあ無難だ
+SentFurigana1:この 服[ふく]ならまあ <b>無難[ぶなん]</b>だ
+SentDef1:这服装的话还算说得过去
+SentDefTC1:
+SentAudio1:[sound:voicepeak-49285dc9.mp3]
