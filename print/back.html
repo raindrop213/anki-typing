@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
 </head>
 <body>
+
     <div class="card">
-        <div class="word">{{kanji:VocabKanji}}</div>
+          <div class="VocabAudio"></div>
+          <h1 class="VocabKanji">
+              <span class="word" lang="ja">{{furigana:VocabKanji}}</span>
+              <span class="VocabPitch">{{VocabPitch}}</span>
+              <span>{{VocabAudio}}</span>
+          </h1>
         
         <div class="typing-container" id="typingContainer">
             <div class="target-display" id="targetDisplay"></div>
@@ -20,35 +26,61 @@
         </div>
             <div id="difficultyResult" class="difficulty-result"></div>
             <div class="instructions" id="meaningSection" style="display: none;">
-                <ul>
-                    <li>
-                        <div>
-                            {{#SentFurigana1}}{{furigana:SentFurigana1}}{{/SentFurigana1}}
-                            {{^SentFurigana1}}{{furigana:SentKanji1}}{{/SentFurigana1}}
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            {{#SentFurigana2}}{{furigana:SentFurigana2}}{{/SentFurigana2}}
-                            {{^SentFurigana2}}{{furigana:SentKanji2}}{{/SentFurigana2}}
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            {{#SentFurigana3}}{{furigana:SentFurigana3}}{{/SentFurigana3}}
-                            {{^SentFurigana3}}{{furigana:SentKanji3}}{{/SentFurigana3}}
-                        </div>
-                    </li>
-                    <li>
-                        <div>
-                            {{#SentFurigana4}}{{furigana:SentFurigana4}}{{/SentFurigana4}}
-                            {{^SentFurigana4}}{{furigana:SentKanji4}}{{/SentFurigana4}}
-                        </div>
-                    </li>
-                </ul>
-
+                <h2 class="VocabFurigana">
+                    <span lang="ja">{{kana:VocabFurigana}}</span>
+                    <span class="VocabPitch">{{VocabPitch}}</span>
+                </h2>
+            
+                <h3 class="VocabPoS LabelIndent2">
+                    <span class="VocabDef">{{VocabDefCN}}</span>
+                </h3>
+            
+                {{#VocabPlus}}
+                <h3 class="VocabPlus LabelIndent" lang="ja">
+                    {{furigana:VocabPlus}}
+                </h3>
+                {{/VocabPlus}}
             </div>
             <div class="instructions" id="continueSection" style="display: none;">按【空格】继续</div>
+
+            <ul class="SentenceList">
+                {{#SentKanji1}}
+                <li class="Sentence">
+                  <h3 class="SentKanji LabelIndent" lang="ja">
+                    {{#SentFurigana1}}{{kanji:SentFurigana1}}{{/SentFurigana1}}
+                    {{^SentFurigana1}}{{kanji:SentKanji1}}{{/SentFurigana1}}
+                  </h3>
+                </li>
+                {{/SentKanji1}}
+            
+                {{#SentKanji2}}
+                <li class="Sentence">
+                  <h3 class="SentKanji LabelIndent" lang="ja">
+                    {{#SentFurigana2}}{{kanji:SentFurigana2}}{{/SentFurigana2}}
+                    {{^SentFurigana2}}{{kanji:SentKanji2}}{{/SentFurigana2}}
+                  </h3>
+                </li>
+                {{/SentKanji2}}
+            
+                {{#SentKanji3}}
+                <li class="Sentence">
+                  <h3 class="SentKanji LabelIndent" lang="ja">
+                    {{#SentFurigana3}}{{kanji:SentFurigana3}}{{/SentFurigana3}}
+                    {{^SentFurigana3}}{{kanji:SentKanji3}}{{/SentFurigana3}}
+                  </h3>
+                </li>
+                {{/SentKanji3}}
+            
+                {{#SentKanji4}}
+                <li class="Sentence">
+                  <h3 class="SentKanji LabelIndent" lang="ja">
+                    {{#SentFurigana4}}{{kanji:SentFurigana4}}{{/SentFurigana4}}
+                    {{^SentFurigana4}}{{kanji:SentKanji4}}{{/SentFurigana4}}
+                  </h3>
+                </li>
+                {{/SentKanji4}}
+              </ul>
+
         </div>
     </div>
 
@@ -80,13 +112,22 @@
             cleanupEventListeners();
             
             // 获取目标罗马音 - 这里需要替换为实际的Anki字段
-            const targetRomaji = convertHiraganaToRomaji("{{VocabFurigana}}");
+            let targetRomaji = convertHiraganaToRomaji("{{VocabFurigana}}");
             
             // 验证罗马音是否存在
             if (!targetRomaji || targetRomaji.trim() === '') {
                 console.error('目标罗马音为空');
                 return;
             }
+            
+            // 如果最后一个字符是空格，则移除它，并记录原始长度
+            const originalLength = targetRomaji.length;
+            if (targetRomaji.endsWith(' ')) {
+                targetRomaji = targetRomaji.slice(0, -1);
+            }
+            
+            // 用于显示的目标长度（隐藏最后一个空格）
+            const displayLength = targetRomaji.length;
             
             let currentIndex = 0;
             let errorCount = 0;
@@ -119,12 +160,12 @@
                 }
             }
             
-            // 更新目标显示
+            // 更新目标显示 - 只显示到倒数第二个字符
             function updateTargetDisplay() {
                 if (!targetDisplay) return;
                 
                 let display = '';
-                for (let i = 0; i < targetRomaji.length; i++) {
+                for (let i = 0; i < displayLength; i++) {
                     const char = targetRomaji[i];
                     if (i < currentIndex) {
                         display += `<span class="correct-char">${char}</span>`;
@@ -162,20 +203,6 @@
                 if (difficultyResult) {
                     difficultyResult.className = `difficulty-result ${difficultyClass}`;
                     difficultyResult.textContent = `${difficultyText} - ${errorCount} 次错误`;
-
-                    // 绑定点击事件，点击时触发对应操作
-                    difficultyResult.style.pointerEvents = 'auto'; // 确保可点
-                    difficultyResult.addEventListener('click', () => {
-                        if (typeof pycmd !== 'undefined') {
-                            if (difficulty === 'easy') {
-                                pycmd('ease4');
-                            } else if (difficulty === 'good') {
-                                pycmd('ease3');
-                            } else {
-                                pycmd('ease2');
-                            }
-                        }
-                    });
                 }
 
                 // 显示 Meaning
@@ -188,9 +215,10 @@
                 const continueSection = document.getElementById('continueSection');
                 continueSection.style.display = 'block';
 
-                // 设置后续监听，按键自动 ease
+                // 设置后续监听，按空格键自动ease
                 window.ankiSpaceListener = function(e) {
-                    if (e.key === 'Control') {
+                    if (e.key === ' ' || e.code === 'Space') {
+                        e.preventDefault(); // 阻止默认行为
                         if (typeof pycmd !== 'undefined') {
                             if (difficulty === 'easy') {
                                 pycmd('ease4');
@@ -232,8 +260,8 @@
                     
                     updateTargetDisplay();
                     
-                    // 检查是否完成
-                    if (currentIndex >= targetRomaji.length) {
+                    // 检查是否完成 - 当输入完显示长度的字符时就完成
+                    if (currentIndex >= displayLength) {
                         completeTyping();
                     }
                     
@@ -400,8 +428,8 @@
                 }
             }
             
-            // 清理多余的空格和特殊字符
-            return result.replace(/\s+/g, '').toLowerCase();
+            // 清理多余的空格和特殊字符，但保留单个空格
+            return result.replace(/\s+/g, ' ').toLowerCase();
         }
         
     </script>
