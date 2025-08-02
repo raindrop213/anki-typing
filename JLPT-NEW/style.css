@@ -620,3 +620,169 @@ a.Feedback {
 .DialogButton.ConfirmButton:hover {
   background-color: var(--button-primary-gradient-start);
 }
+
+/* --- 打字练习样式 --- */
+.typing-container {
+  display: block;
+  margin: 20px 0;
+  background: var(--canvas-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  position: relative;
+}
+
+.target-display {
+  font-size: 18px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  padding: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 0;
+  background: var(--canvas-inset);
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.typing-input {
+  font-size: 18px;
+  font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  padding: 15px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  border: 1px solid var(--border);
+  border-radius: var(--border-radius);
+  background: transparent;
+  color: transparent;
+  text-align: center;
+  width: 100%;
+  outline: none;
+  caret-color: transparent;
+  box-sizing: border-box;
+}
+
+.typing-input.correct {
+  border-color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+  box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+.typing-input.error {
+  border-color: #f44336;
+  background: rgba(244, 67, 54, 0.1);
+  box-shadow: 0 0 5px rgba(244, 67, 54, 0.3);
+  animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  75% { transform: translateX(3px); }
+}
+
+.typing-stats {
+  margin: 15px 0;
+  font-size: var(--text-sm);
+  text-align: center;
+  color: var(--fg-subtle);
+}
+
+
+.error-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #f44336;
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 10px;
+  z-index: 3;
+  min-width: 20px;
+  text-align: center;
+}
+
+.error-count {
+  color: #f44336;
+  font-weight: 600;
+}
+
+.correct-char {
+  color: #4CAF50;
+  background: rgba(76, 175, 80, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-weight: 600;
+}
+
+.current-char {
+  background: var(--button-primary-bg);
+  color: white;
+  padding: 2px 4px;
+  border-radius: 3px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0.6; }
+}
+
+.remaining-char {
+  opacity: 0.4;
+}
+
+.complete {
+  display: none;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.complete.show {
+  display: block;
+}
+
+.typing-container.hide {
+  display: none;
+}
+
+.difficulty-result {
+  font-size: var(--text-lg);
+  font-weight: 600;
+  margin: 20px 0;
+  padding: 15px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid;
+}
+
+.difficulty-result:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.difficulty-easy {
+  background: rgba(44, 105, 245, 0.1);
+  border-color: rgb(44, 105, 245);
+  color: rgb(44, 105, 245);
+}
+
+.difficulty-good {
+  background: rgba(74, 166, 46, 0.1);
+  border-color: rgb(74, 166, 46);
+  color: rgb(74, 166, 46);
+}
+
+.difficulty-hard {
+  background: rgba(191, 122, 41, 0.1);
+  border-color: rgb(191, 122, 41);
+  color: rgb(191, 122, 41);
+}
