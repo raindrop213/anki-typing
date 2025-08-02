@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        .card {
+.card {
     font-family: 'Hiragino Kaku Gothic Pro', 'Meiryo', sans-serif;
     text-align: center;
     padding: 20px;
@@ -188,69 +188,74 @@ margin-left: -0.6em;
                 错误次数: <span class="error-count" id="errorCount">0</span>
             </div>
         </div>
-            <div id="difficultyResult" class="difficulty-result" style="display: none;"></div>
-            <div class="instructions" id="meaningSection" style="display: none;">
-                <h2 class="VocabFurigana">
-                    <span lang="ja">{{kana:VocabFurigana}}</span>
-                    <span class="VocabPitch">{{VocabPitch}}</span>
-                </h2>
-            
-                <h3 class="VocabPoS LabelIndent2">
-                    <span class="VocabDef">{{VocabDefCN}}</span>
-                </h3>
-            
-                {{#VocabPlus}}
-                <h3 class="VocabPlus LabelIndent" lang="ja">
-                    {{furigana:VocabPlus}}
-                </h3>
-                {{/VocabPlus}}
-            </div>
 
-            <ul class="SentenceList">
-                {{#SentKanji1}}
-                <li class="Sentence">
-                  <h3 class="SentKanji LabelIndent" lang="ja">
-                    {{#SentFurigana1}}{{kanji:SentFurigana1}}{{/SentFurigana1}}
-                    {{^SentFurigana1}}{{kanji:SentKanji1}}{{/SentFurigana1}}
-                  </h3>
-                  <h3 class="SentDef LabelIndent">{{SentDef1}}</h3>
-                  <div class="SentAudio">{{SentAudio1}}</div>
-                </li>
-                {{/SentKanji1}}
-            
-                {{#SentKanji2}}
-                <li class="Sentence">
-                  <h3 class="SentKanji LabelIndent" lang="ja">
-                    {{#SentFurigana2}}{{kanji:SentFurigana2}}{{/SentFurigana2}}
-                    {{^SentFurigana2}}{{kanji:SentKanji2}}{{/SentFurigana2}}
-                  </h3>
-                  <h3 class="SentDef LabelIndent">{{SentDef2}}</h3>
-                  <div class="SentAudio">{{SentAudio2}}</div>
-                </li>
-                {{/SentKanji2}}
-            
-                {{#SentKanji3}}
-                <li class="Sentence">
-                  <h3 class="SentKanji LabelIndent" lang="ja">
-                    {{#SentFurigana3}}{{kanji:SentFurigana3}}{{/SentFurigana3}}
-                    {{^SentFurigana3}}{{kanji:SentKanji3}}{{/SentFurigana3}}
-                  </h3>
-                  <h3 class="SentDef LabelIndent">{{SentDef3}}</h3>
-                  <div class="SentAudio">{{SentAudio3}}</div>
-                </li>
-                {{/SentKanji3}}
-            
-                {{#SentKanji4}}
-                <li class="Sentence">
-                  <h3 class="SentKanji LabelIndent" lang="ja">
-                    {{#SentFurigana4}}{{kanji:SentFurigana4}}{{/SentFurigana4}}
-                    {{^SentFurigana4}}{{kanji:SentKanji4}}{{/SentFurigana4}}
-                  </h3>
-                  <h3 class="SentDef LabelIndent">{{SentDef4}}</h3>
-                  <div class="SentAudio">{{SentAudio4}}</div>
-                </li>
-                {{/SentKanji4}}
-              </ul>
+        <!-- 添加缺失的完成界面元素 -->
+        <div class="complete" id="completeSection">
+            <div class="difficulty-result" id="difficultyResult"></div>
+        </div>
+        
+        <div class="instructions" id="meaningSection" style="display: none;">
+            <h2 class="VocabFurigana">
+                <span lang="ja">{{kana:VocabFurigana}}</span>
+                <span class="VocabPitch">{{VocabPitch}}</span>
+            </h2>
+        
+            <h3 class="VocabPoS LabelIndent2">
+                <span class="VocabDef">{{VocabDefCN}}</span>
+            </h3>
+        
+            {{#VocabPlus}}
+            <h3 class="VocabPlus LabelIndent" lang="ja">
+                {{furigana:VocabPlus}}
+            </h3>
+            {{/VocabPlus}}
+        </div>
+
+        <ul class="SentenceList">
+            {{#SentKanji1}}
+            <li class="Sentence">
+              <h3 class="SentKanji LabelIndent" lang="ja">
+                {{#SentFurigana1}}{{kanji:SentFurigana1}}{{/SentFurigana1}}
+                {{^SentFurigana1}}{{kanji:SentKanji1}}{{/SentFurigana1}}
+              </h3>
+              <h3 class="SentDef LabelIndent">{{SentDef1}}<span class="SentAudio">{{SentAudio1}}</span></h3>
+              
+            </li>
+            {{/SentKanji1}}
+        
+            {{#SentKanji2}}
+            <li class="Sentence">
+              <h3 class="SentKanji LabelIndent" lang="ja">
+                {{#SentFurigana2}}{{kanji:SentFurigana2}}{{/SentFurigana2}}
+                {{^SentFurigana2}}{{kanji:SentKanji2}}{{/SentFurigana2}}
+              </h3>
+              <h3 class="SentDef LabelIndent">{{SentDef2}}<span class="SentAudio">{{SentAudio2}}</span></h3>
+              
+            </li>
+            {{/SentKanji2}}
+        
+            {{#SentKanji3}}
+            <li class="Sentence">
+              <h3 class="SentKanji LabelIndent" lang="ja">
+                {{#SentFurigana3}}{{kanji:SentFurigana3}}{{/SentFurigana3}}
+                {{^SentFurigana3}}{{kanji:SentKanji3}}{{/SentFurigana3}}
+              </h3>
+              <h3 class="SentDef LabelIndent">{{SentDef3}}<span class="SentAudio">{{SentAudio3}}</span></h3>
+              
+            </li>
+            {{/SentKanji3}}
+        
+            {{#SentKanji4}}
+            <li class="Sentence">
+              <h3 class="SentKanji LabelIndent" lang="ja">
+                {{#SentFurigana4}}{{kanji:SentFurigana4}}{{/SentFurigana4}}
+                {{^SentFurigana4}}{{kanji:SentKanji4}}{{/SentFurigana4}}
+              </h3>
+              <h3 class="SentDef LabelIndent">{{SentDef4}}<span class="SentAudio">{{SentAudio4}}</span></h3>
+              
+            </li>
+            {{/SentKanji4}}
+          </ul>
 
         </div>
     </div>
@@ -271,9 +276,9 @@ margin-left: -0.6em;
                 document.removeEventListener('keydown', window.ankiKeydownListener);
             }
 
-            if (window.ankiSpaceListener) {
-                document.removeEventListener('keydown', window.ankiSpaceListener);
-                window.ankiSpaceListener = null;
+            if (window.ankiCtrlListener) {
+                document.removeEventListener('keydown', window.ankiCtrlListener);
+                window.ankiCtrlListener = null;
             }
         }
 
@@ -309,7 +314,7 @@ margin-left: -0.6em;
             const errorCountDisplay = document.getElementById('errorCount');
             const completeSection = document.getElementById('completeSection');
             const typingContainer = document.getElementById('typingContainer');
-            const difficultyResult = document.getElementById('difficultyResult');
+            const difficultyResult = document.getElementById('difficultyResult'); // 添加这行
             
             // 重置所有状态
             function resetState() {
@@ -352,7 +357,6 @@ margin-left: -0.6em;
             // 完成打字
             function completeTyping() {
                 isComplete = true;
-                if (typingContainer) typingContainer.classList.add('hide');
                 if (completeSection) completeSection.classList.add('show');
 
                 let difficulty, difficultyClass, difficultyText;
@@ -373,9 +377,23 @@ margin-left: -0.6em;
 
                 if (difficultyResult) {
                     difficultyResult.className = `difficulty-result ${difficultyClass}`;
-                    difficultyResult.textContent = `${difficultyText} - ${errorCount} 次错误 - 按【空格】继续`;
-                }
+                    difficultyResult.textContent = `${difficultyText} - ${errorCount} 次错误 - 按【Ctrl】继续`;
 
+                    // 绑定点击事件，点击时触发对应操作
+                    difficultyResult.style.pointerEvents = 'auto'; // 确保可点
+                    difficultyResult.addEventListener('click', () => {
+                        if (typeof pycmd !== 'undefined') {
+                            if (difficulty === 'easy') {
+                                pycmd('ease4');
+                            } else if (difficulty === 'good') {
+                                pycmd('ease3');
+                            } else {
+                                pycmd('ease2');
+                            }
+                        }
+                    });
+                }
+                
                 // 显示 Meaning
                 const meaningSection = document.getElementById('meaningSection');
                 if (meaningSection) {
@@ -384,12 +402,13 @@ margin-left: -0.6em;
 
                 // 显示继续提示
                 const continueSection = document.getElementById('continueSection');
-                continueSection.style.display = 'block';
+                if (continueSection) {
+                    continueSection.style.display = 'block';
+                }
 
-                // 设置后续监听，按空格键自动ease
-                window.ankiSpaceListener = function(e) {
-                    if (e.key === ' ' || e.code === 'Space') {
-                        e.preventDefault(); // 阻止默认行为
+                // 设置后续监听，按键自动 ease
+                window.ankiCtrlListener = function(e) {
+                    if (e.ctrlKey) {
                         if (typeof pycmd !== 'undefined') {
                             if (difficulty === 'easy') {
                                 pycmd('ease4');
@@ -604,26 +623,26 @@ margin-left: -0.6em;
         }
 
         function getType(index) {
-    return ['{{SentType1}}', '{{SentType2}}', '{{SentType3}}', '{{SentType4}}'][index] || '例'
-  }
-
-  function setType() {
-    ['.SentKanji', '.SentFurigana', '.SentDef', '.VocabPlus', '.VocabPoS'].forEach(selector => {
-      document.querySelectorAll(selector).forEach((el, i) => {
-        if (!el.textContent.trim() || el.querySelector('em')) return
-        const typeMap = {
-          'SentDef': '［訳］',
-          'VocabPlus': '［補］',
-          'SentKanji': `［${getType(i)}］`,
-          'SentFurigana': `［${getType(i)}］`,
-          'VocabPoS': '{{VocabPoS}}' ? '［{{VocabPoS}}］' : '［名］',
+            return ['{{SentType1}}', '{{SentType2}}', '{{SentType3}}', '{{SentType4}}'][index] || '例'
         }
-        const type = typeMap[Object.keys(typeMap).find(key => el.className.includes(key))]
-        el.insertAdjacentHTML('afterbegin', `<em lang='ja'>${type}</em>`)
-      })
-    })
-  }
-  setType()
+
+        function setType() {
+            ['.SentKanji', '.SentFurigana', '.SentDef', '.VocabPlus', '.VocabPoS'].forEach(selector => {
+            document.querySelectorAll(selector).forEach((el, i) => {
+                if (!el.textContent.trim() || el.querySelector('em')) return
+                const typeMap = {
+                'SentDef': '［訳］',
+                'VocabPlus': '［補］',
+                'SentKanji': `［${getType(i)}］`,
+                'SentFurigana': `［${getType(i)}］`,
+                'VocabPoS': '{{VocabPoS}}' ? '［{{VocabPoS}}］' : '［名］',
+                }
+                const type = typeMap[Object.keys(typeMap).find(key => el.className.includes(key))]
+                el.insertAdjacentHTML('afterbegin', `<em lang='ja'>${type}</em>`)
+            })
+            })
+        }
+        setType()
         
     </script>
 </body>
