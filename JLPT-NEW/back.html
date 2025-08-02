@@ -4,7 +4,7 @@
 
 {{FrontSide}}
 
-<div class="VocabAudio !hidden">{{VocabAudio}}</div>
+<div class="VocabAudio !hidden" id="vocabAudio">{{VocabAudio}}</div>
 
 <main id="BackSide" class="CardSide">
   <section class="Answer hideAnswer">
@@ -104,7 +104,7 @@
   highlightWords()
   audioStylePatch()
   hideFrontElements()
-  typeof onShownHook !== 'undefined' ? onShownHook.push(forcePlayback) : forcePlayback()
+  // typeof onShownHook !== 'undefined' ? onShownHook.push(forcePlayback) : forcePlayback()
 
   // 安卓平台需要重复正面调用的方法
   if (isAndroid()) setupCard()
@@ -416,6 +416,7 @@
         if (currentIndex === targetRomaji.length - 1 && !difficultyPrepared) {
           difficultyPrepared = true;
           prepareDifficultyDisplay();
+          forcePlayback();
         }
         
         // 检查是否完成（输入了最后的空格）
@@ -445,26 +446,20 @@
         }, 500);
       }
     }
-    
+
     // 键盘事件处理函数
     function handleKeydown(e) {
       if (e.key === 'Control') {
         e.preventDefault(); // 防止浏览器默认行为
-        
-        if (isComplete) {
-          // 输入完成后，朗读单词
-          const vocabAudio = document.querySelector('.VocabAudio');
-          if (vocabAudio) {
-            const audioElement = vocabAudio.querySelector('audio');
-            if (audioElement) {
-              audioElement.play();
-            }
-          }
-        } else {
+        forcePlayback();
+
+        // 只有在打字练习真正未完成时才增加错误次数
+        // 当难度已经准备好显示时，说明打字练习实质上已经完成
+        if (!isComplete && !difficultyPrepared) {
           // 输入未完成，增加3次错误
           errorCount += 3;
-          updateErrorCount();
-          
+          updateErrorCount(); 
+
           // 显示错误提示
           if (typingInput) {
             typingInput.className = 'typing-input error';
@@ -478,7 +473,8 @@
       } else if (e.key === 'Escape') {
         e.preventDefault(); // 防止浏览器默认行为
         
-        if (!isComplete) {
+        // 只有在打字练习真正未完成时才增加错误次数和自动完成
+        if (!isComplete && !difficultyPrepared) {
           errorCount += 4;
           updateErrorCount();
           // 按 ESC 键自动输入完剩下的字母
