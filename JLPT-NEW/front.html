@@ -5,7 +5,7 @@
 <main id="FrontSide" class="CardSide">
   <div class="Top">
     <span class="Level">{{Tags}}</span>
-    <a class="Feedback" href="#" target="_blank" onclick="feedback(event)">反馈</a>
+    <a target="_blank" class="Feedback">反馈</a>
   </div>
 
   <header class="Question">
@@ -14,7 +14,7 @@
       <span lang="ja">{{furigana:VocabKanji}}</span>
       <span class="VocabPitch">{{VocabPitch}}</span>
     </h1>
-    <a class="Search" href="#" target="_blank" onclick="lookUp()">🔍</a>
+    <a target="_blank" class="Search">🔍</a>
   </header>
 
   <ul class="SentenceList">
@@ -70,6 +70,11 @@
       },
       display: 'default',   // 正面单词显示: 'default' 显示汉字和注音假名 | 'kana' 只显示假名 | 'kanji' 只显示汉字
       playback: 'force',    // 背面播放设置: 'default' 跟随牌组的系统设置 | 'force' 强制只播放单词音频
+      autoCopy: {           // 背面自动复制: true 开启 | false 关闭
+        ipad: true,
+        iphone: false,
+        ankiweb: false,
+      },
       tts: {
         enable: 'fallback', // 在线 TTS 开关: 'always' 始终开启 | 'fallback' 无本地音频时启用 | 'never' 始终关闭
         hotkey: 'G',        // 播放快捷键，仅支持桌面端
@@ -131,6 +136,22 @@
       updateDetails: {
         'zh-Hans': '更新说明',
         'zh-Hant': '更新說明',
+      },
+      cardFeedback: {
+        'zh-Hans': '卡片反馈',
+        'zh-Hant': '卡片反饋',
+      },
+      cardInfo: {
+        'zh-Hans': '卡片信息',
+        'zh-Hant': '卡片資訊',
+      },
+      cardVersion: {
+        'zh-Hans': '卡片版本',
+        'zh-Hant': '卡片版本',
+      },
+      feedbackContent: {
+        'zh-Hans': '反馈内容',
+        'zh-Hant': '反饋內容',
       }
     }
     const lang = CONFIG().settings.lang
@@ -166,10 +187,11 @@
 
       const data = await response.json()
       latest = `v${data.tag_name?.split('_')[0].replace(/^v/, '')}`
-      info = data.body?.replace(/\r?\n/g, '<br>')
-        .replace(/`(.*?)`/g, '<code>$1</code>')
-        .replace(/(\s+)-/g, '$1◦')
-        .replace(/-/g, '▪')
+      info = data.body?.replace(/`(.*?)`/g, (match, p1) => `<code>${p1}</code>`)
+        .replace(/\r?\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+        .replace(/(\s+)-(?!(?:[^<]*>|[^<>]*<\/code>))/g, '$1◦')
+        .replace(/-(?!(?:[^<]*>|[^<>]*<\/code>))/g, '▪')
     } catch (err) {
       console.error(err)
     }
@@ -188,13 +210,13 @@
       <h2 class="DialogTitle">${config.title || '提示'}</h2>
       <div class="DialogBody">${config.content || ''}</div>
       <div class="DialogFooter">
-        ${config.cancelText ? `<a href="#" target="_blank" class="DialogButton CancelButton">${config.cancelText}</a>` : ''}
-        <a href="#" target="_blank" class="DialogButton ConfirmButton">${config.confirmText || '确定'}</a>
+        ${config.cancelText ? `<a target="_blank" class="DialogButton CancelButton">${config.cancelText}</a>` : ''}
+        <a target="_blank" class="DialogButton ConfirmButton">${config.confirmText || '确定'}</a>
       </div>
     </div>
     `
     modal.querySelector('.DialogContent').addEventListener('click', e => e.stopPropagation())
-    modal.querySelector('.CancelButton')?.addEventListener('click', e => { e.preventDefault(); (config.onCancel || closeDialog)() })
+    modal.querySelector('.CancelButton')?.addEventListener('click', config.onCancel || closeDialog)
     modal.querySelector('.ConfirmButton').addEventListener('click', config.onConfirm || closeDialog)
     modal.addEventListener('click', closeDialog)
     document.getElementById('qa').appendChild(modal)
@@ -215,52 +237,52 @@
     const { latest, info } = shouldFetch ? await getLatestReleaseInfo().then(res => (setStorage(res), res)) : storage
 
     const icon = el.querySelector('i')
-    if (current && latest && current !== latest) {
-      if (!icon) {
-        el.insertAdjacentHTML('afterbegin', '<i>🎉 </i>')
-      }
+    if (!getTags().isDeleted && current && latest && current < latest) {
+      if (!icon) el.insertAdjacentHTML('afterbegin', '<i>🎉 </i>')
     } else {
       icon?.remove()
     }
     return { current, latest, info }
   }
 
-  async function feedback(e) {
-    const current = getCurrentVersion()
-    const { latest, info } = await checkVersion(!current)
+  function feedback(e) {
+    const feedbackBtn = document.querySelector('.Feedback')
+    feedbackBtn.addEventListener('click', async e => {
+      const current = getCurrentVersion()
+      const { latest, info } = await checkVersion(!current)
 
-    if (!current || current !== latest) {
-      e.preventDefault()
-      createDialog({
-        title: `
-        <p>🎉 可用更新</p>
-        <span>${getTranslation('updateReminder')}</span>
-        `,
-        content: `
-        <p>📌 ${getTranslation('versionCurrent')}: ${current || 'Unknown'}</p>
-        <p>🌟 ${getTranslation('versionLatest')}: ${latest || 'Unknown'}</p>
-        <p>🚀 ${getTranslation('updateDetails')}: </p>
-        <ul>${info || '- No details available'}</ul>
-        `,
-        cancelText: '取消',
-        confirmText: '更新',
-        onConfirm: () => {
-          document.querySelector('a.ConfirmButton').href = 'https://github.com/5mdld/anki-jlpt-decks/releases/latest'
-          closeDialog()
-        }
-      })
-    } else {
-      document.querySelector('a.Feedback').href = getFeedbackLink()
-    }
+      if (!current || current < latest) {
+        createDialog({
+          title: `
+          <p>🎉 可用更新</p>
+          <span>${getTranslation('updateReminder')}</span>
+          `,
+          content: `
+          <p>📌 ${getTranslation('versionCurrent')}: ${current || 'Unknown'}</p>
+          <p>🌟 ${getTranslation('versionLatest')}: ${latest || 'Unknown'}</p>
+          <p>🚀 ${getTranslation('updateDetails')}: </p>
+          <ul>${info || '- No details available'}</ul>
+          `,
+          cancelText: '取消',
+          confirmText: '更新',
+          onConfirm: () => {
+            document.querySelector('a.ConfirmButton').href = 'https://github.com/5mdld/anki-jlpt-decks/releases/latest'
+            closeDialog()
+          }
+        })
+      } else {
+        feedbackBtn.href = getFeedbackLink()
+      }
+    })
   }
 
   function getFeedbackLink(platform = 'github', VocabKanji = '{{text:kanji:VocabKanji}}', NoteID = '{{text:NoteID}}') {
     const current = getCurrentVersion()
     const urls = {
-      github: `https://github.com/5mdld/anki-jlpt-decks/issues/new?${new URLSearchParams({
-        title: `[卡片反馈] ${getToday()} 「${VocabKanji}」`,
-        body: `### 卡片信息\n- 卡片版本: ${current}\n- VocabKanji: ${VocabKanji}\n- NoteID: ${NoteID}\n\n### 反馈内容\n`,
-      })}`,
+      github: `https://github.com/5mdld/anki-jlpt-decks/issues/new?${Object.entries({
+        title: `[${getTranslation('cardFeedback')}] ${getToday()} 「${VocabKanji}」`,
+        body: `### ${getTranslation('cardInfo')}\n- ${getTranslation('cardVersion')}: ${current}\n- VocabKanji: ${VocabKanji}\n- NoteID: ${NoteID}\n\n### ${getTranslation('feedbackContent')}\n`
+      }).map(([key, value]) => `${key}=${encodeURIComponent(value)}`).join('&')}`,
       feishu: `https://ncn8ci2h7v0y.feishu.cn/share/base/form/shrcnTh5DRxtrGWtiWTkdBlSWze?${new URLSearchParams({
         NoteID,
         Version: current
@@ -273,35 +295,46 @@
     return ['ios', 'android', 'mac', 'win'].find(p => document.documentElement.className.includes(p)) || 'other'
   }
 
+  function getDevice() {
+    if (isAnkiWeb()) return 'ankiweb'
+    return ['iphone', 'ipad'].find(p => document.documentElement.className.includes(p)) || 'other'
+  }
+
   function isAndroid() {
     return !!document.documentElement.className.includes('android')
+  }
+
+  function isAnkiWeb() {
+    return !!document.getElementById('quiz')
   }
 
   function isBackSide() {
     return !!document.getElementById('BackSide')
   }
 
-  function cleanWord(word) {
+  function cleanWord(word = '{{text:kanji:VocabKanji}}') {
     return word.replace(/\[[^\]]*\]|\([^)]*\)|[0-9!@#$%^&*()_+\-='":\\|,.<>/?~～〜\s]+/g, '')
   }
 
-  function lookUp(word = '{{text:VocabKanji}}') {
-    const cleaned = cleanWord(word)
-    const dict = CONFIG().settings.dict[getPlatform()]
-    const scheme = CONFIG().dictOptions[dict]
-    if (!scheme) {
-      createDialog({
-        content: `<p class="text-center">${getTranslation('dictionaryTip')}</p>`,
-        cancelText: '取消',
-        confirmText: '查看文档',
-        onConfirm: () => {
-          document.querySelector('a.ConfirmButton').href = 'https://github.com/5mdld/anki-jlpt-decks/blob/main/README.md'
-          closeDialog()
-        }
-      })
-    }
-    const url = scheme.replace('{query}', encodeURIComponent(cleaned))
-    document.querySelector('a.Search').href = url
+  function lookUp(word = '{{text:kanji:VocabKanji}}') {
+    const searchBtn = document.querySelector('.Search')
+    searchBtn.addEventListener('click', e => {
+      const cleaned = cleanWord()
+      const dict = CONFIG().settings.dict[getPlatform()]
+      const scheme = CONFIG().dictOptions[dict]
+      if (!scheme) {
+        createDialog({
+          content: `<p class="text-center">${getTranslation('dictionaryTip')}</p>`,
+          cancelText: '取消',
+          confirmText: '查看文档',
+          onConfirm: () => {
+            document.querySelector('a.ConfirmButton').href = 'https://github.com/5mdld/anki-jlpt-decks/blob/main/README.md'
+            closeDialog()
+          }
+        })
+      }
+      searchBtn.href = scheme.replace('{query}', encodeURIComponent(cleaned))
+    })
   }
 
   function forcePlayback() {
@@ -330,7 +363,7 @@
         }
         return
       }
-      const isKatakana = getTags().includes('外') || /^[ァ-ヴー]+$/.test('{{VocabKanji}}')
+      const isKatakana = getTags().isLoanword || /^[ァ-ヴー]+$/.test('{{VocabKanji}}')
       updateText('.VocabKanji span[lang="ja"]', isKatakana ? '{{kanji:VocabKanji}}' : '{{VocabFurigana}}')
     }
   }
@@ -355,16 +388,35 @@
   }
 
   function getTags(tags = '{{Tags}}') {
-    const ignore = ['$', '^', 'v']
-    return tags.split(/\s+/)
+    const ignoreTags = ['$', '^', 'v']
+    const deleteTags = ['del', 'delete', 'remove', 'outdated']
+
+    const rawTags = tags.split(/\s+/)
       .map(tag => tag.split(/::|-/).pop())
-      .filter(tag => !ignore.some(prefix => tag.startsWith(prefix)))
-      .sort((a, b) => b.startsWith('N') - a.startsWith('N') || a.localeCompare(b))
-      .join('・')
+      .filter(tag => tag && !ignoreTags.some(prefix => tag.startsWith(prefix)))
+
+    const deleted = rawTags.filter(tag => deleteTags.includes(tag))
+    const normal = rawTags.filter(tag => !deleteTags.includes(tag))
+
+    const compareTags = (a, b) => {
+      const getPriority = s => s.startsWith('N') ? 0 : /^[a-zA-Z]/.test(s) ? 1 : 2
+      const pa = getPriority(a)
+      const pb = getPriority(b)
+      if (pa !== pb) return pa - pb
+      return a.localeCompare(b)
+    }
+    const sorted = [...normal].sort(compareTags)
+
+    return {
+      all: [...sorted, ...deleted],
+      formatted: [...sorted, ...deleted].join('・'),
+      isDeleted: deleted.length > 0,
+      isLoanword: sorted.includes?.('外'),
+    }
   }
 
   function setLang() {
-    updateText('.Level', getTags())
+    updateText('.Level', getTags().formatted)
     updateText('.Feedback', getCurrentVersion() ? `${getCurrentVersion()}・${getTranslation('feedback')}` : getTranslation('feedback'))
     const lang = CONFIG().settings.lang
     if (lang === 'zh-Hant') {
@@ -373,7 +425,6 @@
       const defs = ['{{SentDefTC1}}', '{{SentDefTC2}}', '{{SentDefTC3}}', '{{SentDefTC4}}']
       defs.forEach((def, index) => updateText(`li:nth-child(${index + 1}) .SentDef`, def))
     }
-    checkVersion()
   }
 
   function removeSpaces() {
@@ -412,10 +463,10 @@
     })
   }
 
-  function markWords(word = '{{text:VocabKanji}}') {
+  function markWords(word = '{{text:kanji:VocabKanji}}') {
     const wordRegex = /[一-龠々ヵヶ]+|[ぁ-んァ-ヴー]+/g
     const kanjiRegex = /[一-龠々ヵヶ]/
-    const parts = cleanWord(word).match(wordRegex) ?? []
+    const parts = cleanWord().match(wordRegex) ?? []
     const regexParts = parts.map(part => {
       return kanjiRegex.test(part)
         ? `(?:<ruby><rb>${part}</rb><rt>[^<]+</rt></ruby>|${part})`
@@ -429,7 +480,7 @@
         if (el.querySelector('b, i, u, span, strong') || type !== '例') return
         el.innerHTML = el.innerHTML
           .replace(regex, match => `<strong>${match}</strong>`)
-          .replace(/[～〜]/g, `<strong>${cleanWord(word)}</strong>`)
+          .replace(/[～〜]/g, `<strong>${cleanWord()}</strong>`)
       })
     })
   }
@@ -456,7 +507,7 @@
   }
 
   function setAnkiWebAudio() {
-    if (!document.getElementById('quiz')) return
+    if (!isAnkiWeb()) return
 
     document.querySelectorAll('.VocabAudio, .SentAudio').forEach(el => {
       const audio = el.querySelector('audio')
@@ -545,16 +596,34 @@
       }).catch(() => (isError = true))
     }
   }
+
+  function autoCopyWord() {
+    if (!CONFIG().settings.autoCopy[getDevice()]) return
+    setTimeout(async () => {
+      try {
+        await navigator.clipboard.writeText(cleanWord())
+      } catch (err) {
+        console.error(err)
+      }
+    }, 0)
+  }
+
+  function setupCard() {
+    lookUp()
+    feedback()
+    setLang()
+    setType()
+    markWords()
+    hideKanji()
+    removeSpaces()
+    checkVersion()
+  }
 </script>
 
 <script>
-  setLang()
-  setType()
-  markWords()
-  removeSpaces()
-  setAnkiWebAudio()
+  setupCard()
   hideFurigana()
-  hideKanji()
+  setAnkiWebAudio()
 </script>
 
 {{/Alt1}}
